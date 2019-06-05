@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>[sqlite] Possible UNICODE LIKE, upper(), lower() function solution</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="apple-touch-icon" sizes="114x114" href="/apple-touch-icon-114x114.png">
+<link rel="apple-touch-icon" sizes="72x72" href="/apple-touch-icon-72x72.png">
+<link rel="apple-touch-icon" sizes="57x57" href="/apple-touch-icon-57x57.png">
+<link rel="shortcut icon" href="/favicon.ico">
+<link rel="contents" href="index.html#30403" id="c">
+<link rel="index" href="maillist.html#30403" id="i">
+<link rel="prev" href="msg30401.html" id="p">
+<link rel="next" href="msg30404.html" id="n">
+<link rel="canonical" href="https://www.mail-archive.com/sqlite-users@mailinglists.sqlite.org/msg30403.html">
+<link rel="stylesheet" href="/normalize.css" media="screen">
+<link rel="stylesheet" href="/master.css" media="screen">
+
+<!--[if lt IE 9]>
+<link rel="stylesheet" href="/ie.css" media="screen">
+<![endif]-->
+</head>
+<body>
+<script language="javascript" type="text/javascript">
+document.onkeydown = NavigateThrough;
+function NavigateThrough (event)
+{
+  if (!document.getElementById) return;
+  if (window.event) event = window.event;
+  if (event.target.tagName == 'INPUT') return;
+  if (event.ctrlKey || event.metaKey) return;
+  var link = null;
+  switch (event.keyCode ? event.keyCode : event.which ? event.which : null) {
+    case 74:
+    case 80:
+      link = document.getElementById ('p');
+      break;
+    case 75:
+    case 78:
+      link = document.getElementById ('n');
+      break;
+    case 69:
+      link = document.getElementById ('e');
+      break;
+    }
+  if (link && link.href) document.location = link.href;
+}
+</script>
+<div itemscope itemtype="http://schema.org/Article" class="container">
+<div class="skipLink">
+<a href="#nav">Skip to site navigation (Press enter)</a>
+</div>
+<div class="content" role="main">
+<div class="msgHead">
+<h1>
+<span class="subject"><a href="/search?l=sqlite-users@mailinglists.sqlite.org&amp;q=subject:%22%5C%5Bsqlite%5C%5D+Possible+UNICODE+LIKE%2C+upper%5C%28%5C%29%2C+lower%5C%28%5C%29+function+solution%22&amp;o=newest" rel="nofollow"><span itemprop="name">[sqlite] Possible UNICODE LIKE, upper(), lower() function solution</span></a></span>
+</h1>
+<p class="darkgray font13">
+<span class="sender pipe"><a href="/search?l=sqlite-users@mailinglists.sqlite.org&amp;q=from:%22ioannis%22" rel="nofollow"><span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">ioannis</span></span></a></span>
+<span class="date"><a href="/search?l=sqlite-users@mailinglists.sqlite.org&amp;q=date:20080103" rel="nofollow">Thu, 03 Jan 2008 04:11:17 -0800</a></span>
+</p>
+</div>
+<div itemprop="articleBody" class="msgBody">
+<!--X-Body-of-Message-->
+<pre>Dear all SQLite3 users,
+
+Recently i have been working on a dictionary style project that had to
+work with UNICODE non-latin1 strings, i did try the ICU project but i
+wasn't satisfied with the extra baggage that came with it.
+I would like to recommend the following possible solution to the long
+standing UNICODE issue, that was built in as an ICU alternative
+(excluding collation's), and could be easily be included in the SQLite
+core as default behavior.</pre><pre>
+
+<a  rel="nofollow" href="http://ioannis.mpsounds.net/blog/?dl=sqlite3_unicode.c">http://ioannis.mpsounds.net/blog/?dl=sqlite3_unicode.c</a>
+
+The above file contains mapping tables for lower(), upper(), title(),
+fold()* characters based on UNICODE mapping tables as described
+currently by the UNICODE standard v5.1.0 beta, that are used by
+functions to transform characters to their respective folding cases.
+(These tables were built by a modified version of Loic Dachary builder
+in order to included required case transformations)
+* UNICODE uses case folding mapping tables to implement non-case
+sensitive comparison sequences (eg LIKE).
+
+The above file utilizes the existing ICU infrastructure built in
+SQLite in order to activate the extra functionality, to automatically
+:
+- override the LIKE operation, to support full UNICODE non-case
+sensitive comparison
+- override upper(), lower(), to support case transformation of UNICODE
+characters based on UNICODE mapping tables as described currently by
+the UNICODE standard v5.1.0 beta
+- provide title() and fold() functions, also based on UNICODE mapping
+tables as described currently by the UNICODE standard v5.1.0 beta
+- provide unaccent() function, (based on the unac library designed for
+linux by Loic Dachary) to decompose UNICODE characters to there
+unaccented equivalents in order to perform simpler queries and return
+wider range of results. (eg. ά -&gt; α, æ -&gt; ae in the latter example the
+string will automatically grow by 1 character point)
+
+In comparison to ICU no collation sequences have been implemented yet.
+The above functionalities have been designed to be included/excluded
+independently according to specific needs in order to minimize the
+size of the library.
+The total overhead over the SQLite library size with all functionality
+enabled is approximately 70~80KB.
+
+The above file has not been thoroughly tested, but i consider the
+implementation to stable.
+You can leave comments, bug reports, suggestions on this board or at
+<a  rel="nofollow" href="http://ioannis.mpsounds.net/blog/2007/12/19/sqlite-native-unicode-like-support">http://ioannis.mpsounds.net/blog/2007/12/19/sqlite-native-unicode-like-support</a>
+(PS. I am not an SQLite expert, but i had to improvise on some extent
+on this matter.)
+
+Thank you very much.
+</pre>
+
+</div>
+<div class="msgButtons margintopdouble">
+<ul class="overflow">
+<li class="msgButtonItems"><a class="button buttonleft " accesskey="p" href="msg30401.html">Previous message</a></li>
+<li class="msgButtonItems textaligncenter"><a class="button" accesskey="c" href="index.html#30403">View by thread</a></li>
+<li class="msgButtonItems textaligncenter"><a class="button" accesskey="i" href="maillist.html#30403">View by date</a></li>
+<li class="msgButtonItems textalignright"><a class="button buttonright " accesskey="n" href="msg30404.html">Next message</a></li>
+</ul>
+</div>
+<a name="tslice"></a>
+<div class="tSliceList margintopdouble">
+<ul class="icons monospace">
+<li class="icons-email tSliceCur"><span class="subject">[sqlite] Possible UNICODE LIKE, upper(), lower() function...</span> <span class="sender italic">ioannis</span></li>
+<li><ul>
+<li class="icons-email"><span class="subject"><a href="msg30404.html">Re: [sqlite] Possible UNICODE LIKE, upper(), lower()...</a></span> <span class="sender italic">Cory Nelson</span></li>
+<li class="icons-email"><span class="subject"><a href="msg30430.html">Re: [sqlite] Possible UNICODE LIKE, upper(), lower()...</a></span> <span class="sender italic">Jiri Hajek</span></li>
+<li class="icons-email"><span class="subject"><a href="msg30438.html">Re: [sqlite] Possible UNICODE LIKE, upper(), lower()...</a></span> <span class="sender italic">Nicolas Williams</span></li>
+<li><ul>
+<li class="icons-email"><span class="subject"><a href="msg30434.html">Re: [sqlite] Possible UNICODE LIKE, upper(), low...</a></span> <span class="sender italic">Scott Hess</span></li>
+</ul>
+</ul>
+</ul>
+</div>
+<div class="overflow msgActions margintopdouble">
+<div class="msgReply" >
+<h2>
+					Reply via email to
+</h2>
+<form method="POST" action="/mailto.php">
+<input type="hidden" name="subject" value="[sqlite] Possible UNICODE LIKE, upper(), lower() function solution">
+<input type="hidden" name="msgid" value="51a5c90d0801030410w2beb31ffhcb1113e461d81b5a@mail.gmail.com">
+<input type="hidden" name="relpath" value="sqlite-users@mailinglists.sqlite.org/msg30403.html">
+<input type="submit" value=" ioannis ">
+</form>
+</div>
+</div>
+</div>
+<div class="aside" role="complementary">
+<div class="logo">
+<a href="/"><img src="/logo.png" width=247 height=88 alt="The Mail Archive"></a>
+</div>
+<form class="overflow" action="/search" method="get">
+<input type="hidden" name="l" value="sqlite-users@mailinglists.sqlite.org">
+<label class="hidden" for="q">Search the site</label>
+<input class="submittext" type="text" id="q" name="q" placeholder="Search sqlite-users">
+<input class="submitbutton" name="submit" type="image" src="/submit.png" alt="Submit">
+</form>
+<div class="nav margintop" id="nav" role="navigation">
+<ul class="icons font16">
+<li class="icons-home"><a href="/">The Mail Archive home</a></li>
+<li class="icons-list"><a href="/sqlite-users@mailinglists.sqlite.org/">sqlite-users - all messages</a></li>
+<li class="icons-about"><a href="/sqlite-users@mailinglists.sqlite.org/info.html">sqlite-users - about the list</a></li>
+<li class="icons-expand"><a href="/search?l=sqlite-users@mailinglists.sqlite.org&amp;q=subject:%22%5C%5Bsqlite%5C%5D+Possible+UNICODE+LIKE%2C+upper%5C%28%5C%29%2C+lower%5C%28%5C%29+function+solution%22&amp;o=newest&amp;f=1" title="e" id="e">Expand</a></li>
+<li class="icons-prev"><a href="msg30401.html" title="p">Previous message</a></li>
+<li class="icons-next"><a href="msg30404.html" title="n">Next message</a></li>
+</ul>
+</div>
+<div class="listlogo margintopdouble">
+<a href="#"><img src="/sqlite-users@mailinglists.sqlite.org/logo.png" alt="sqlite-users"></a>
+</div>
+<div class="margintopdouble">
+
+</div>
+</div>
+</div>
+<div class="footer" role="contentinfo">
+<ul>
+<li><a href="/">The Mail Archive home</a></li>
+<li><a href="/faq.html#newlist">Add your mailing list</a></li>
+<li><a href="/faq.html">FAQ</a></li>
+<li><a href="/faq.html#support">Support</a></li>
+<li><a href="/faq.html#privacy">Privacy</a></li>
+<li class="darkgray">51a5c90d0801030410w2beb31ffhcb1113e461d81b5a@mail.gmail.com</li>
+</ul>
+</div>
+</body>
+</html>
